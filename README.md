@@ -3,7 +3,7 @@
 API REST per l'integrazione con WSACPersonaFisica (SOAP) di U-GOV JP
 
 Questo progetto è un componente del progetto più ampio di un gruppo
-di micro servizi mirati all'integrazione con U-GOV, e possibile attivarli
+di micro servizi mirati all'integrazione con U-GOV, è possibile attivarli
 singolarmente in modo modulare, e attivarne molteplici in modo scalare in caso di necessità
 
 
@@ -59,7 +59,7 @@ Clonare il progetto
     
 - #### Ambiente di Sviluppo
     
-    Assicurarsi di avere Doclker Installato
+    Assicurarsi di avere Docker Installato
     
     Se necessario modificare il binding porta 8022
   
@@ -81,9 +81,9 @@ Clonare il progetto
     - binding porta 8022 `-p 8022:80`
     - il numero di Worker editando  `WEB_CONCURRENCY=1`
   
-  Il reverse Proxy e' deleagato ad un webserver ad esempio Nginx
+  Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
   
-  il servizio si avvia avvia http://{url}:8022/
+  il servizio si avvia http://{url}:8022/
 
 - #### Ambiente di Produzione
 
@@ -96,9 +96,9 @@ Clonare il progetto
   
   Per il calcolo del numero di worker eseguire la seguente operazione `(CPU x 2)+1`
   
-  Il reverse Proxy e' deleagato ad un webserver ad esempio Nginx
+  Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
   
-  il servizio si avvia avvia http://{url}:8022/
+  il servizio si avvia http://{url}:8022/
 
 
 ## Documentazione e Test delle Api
@@ -112,7 +112,7 @@ Tramite la Documentazione Swagger e' possibile testare le API:
 
 - {BASE_URL}:8022/docs
 
-Per eseguire i test e' necessario inserire come parametro header il token JWT generato
+Per eseguire i test è necessario inserire come parametro header il token JWT generato
 
 ## Costruito con
 
