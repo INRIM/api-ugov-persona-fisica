@@ -75,7 +75,7 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-@app.get("/", tags=["base"])
+@app.get("/personafisica/", tags=["base"])
 async def service_status():
     """
     Ritorna lo stato del servizio
@@ -83,7 +83,7 @@ async def service_status():
     return {"status": "live"}
 
 
-@app.post("/genera-token", tags=["base"])
+@app.post("/personafisica/genera-token", tags=["base"])
 async def genera_token(tokendata: Token):
     """
     Genera un token JWT
@@ -96,7 +96,7 @@ async def genera_token(tokendata: Token):
 
 # Aggiungi il codice qui
 
-@app.get("/v1/persone", tags=["v1"])
+@app.get("/personafisica/v1/persone", tags=["v1"])
 async def elenca_persone(
         cognome: Optional[str] = None,
         nome: Optional[str] = None,
@@ -162,7 +162,7 @@ async def estrai_persona_base(
     return res
 
 
-@app.get("/v1/estrai-persona", tags=["v1"])
+@app.get("/personafisica/v1/estrai-persona", tags=["v1"])
 async def estrai_persona(
         dataRiferimento: date,
         client: Optional[str] = None,
@@ -206,7 +206,7 @@ async def estrai_persona(
 
 
 @app.post(
-    "/v1/persona/inserisci", tags=["v1"]
+    "/personafisica/v1/persona/inserisci", tags=["v1"]
 )
 async def inserisci_persona(
         persona: Persona,
