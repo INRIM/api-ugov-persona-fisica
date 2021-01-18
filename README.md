@@ -14,7 +14,7 @@ Clonare il progetto
 - #### Configurazione 
     - creare una copia di .env.example:
       ```
-        cp .env.json.example  app/.env
+        cp .env.example  app/.env
         ```
   
 - #### Url Ambienti U-GOV
