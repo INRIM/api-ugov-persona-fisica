@@ -2,8 +2,8 @@
 
 API REST per l'integrazione con WSACPersonaFisica (SOAP) di U-GOV JP
 
-Questo progetto è un componentne del progetto più ampio di un gruppo
-di microservizi mirati all'integrazione con U-GOV, e possibile attivarli
+Questo progetto è un componente del progetto più ampio di un gruppo
+di micro servizi mirati all'integrazione con U-GOV, e possibile attivarli
 singolarmente in modo modulare, e attivarne molteplici in modo scalare in caso di necessità
 
 
