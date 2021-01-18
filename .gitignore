@@ -1,0 +1,12 @@
+.DS_Store
+script/automation/etc/*
+script/automation/etc/.
+!script/automation/etc/template_for_service
+*.csv
+*.pyc
+venv
+env
+key.json
+jwt_setting.json
+.idea
+.env
