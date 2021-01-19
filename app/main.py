@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 tags_metadata = [
     {
-        "name": "v1",
+        "name": ":-)",
         "description": "API REST per l'integrazione con WSACPersonaFisica (SOAP) di U-GOV JP",
         "externalDocs": {
             "description": "UGOV WS DOCS",
@@ -96,7 +96,7 @@ async def genera_token(tokendata: Token):
 
 # Aggiungi il codice qui
 
-@app.get("/v1/persone", tags=["v1"])
+@app.get("/v1/persone", tags=["v1 persona"])
 async def elenca_persone(
         cognome: Optional[str] = None,
         nome: Optional[str] = None,
@@ -104,7 +104,8 @@ async def elenca_persone(
         authtoken: str = Header(None)
 ) -> dict:
     """
-    Pass data for persona search
+    Binding del servizio SOAP U-GOV [elencaPersone](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-elencaPersone)
+
     """
     auth = check_token_get_auth(authtoken)
     pf = PersonaFisicaService(auth)
@@ -119,7 +120,7 @@ async def elenca_persone(
     return res
 
 
-@app.get("/v1/estrai-persona-base", tags=["v1"])
+@app.get("/v1/estrai-persona-base", tags=["v1 persona"])
 async def estrai_persona_base(
         dataRiferimento: Optional[date] = None,
         client: Optional[str] = None,
@@ -137,6 +138,7 @@ async def estrai_persona_base(
         authtoken: str = Header(None)
 ) -> dict:
     """
+    Binding del servizio SOAP U-GOV [estraiPersonaBase](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-estraiPersonaBase)
 
     """
     auth = check_token_get_auth(authtoken)
@@ -162,7 +164,7 @@ async def estrai_persona_base(
     return res
 
 
-@app.get("/v1/estrai-persona", tags=["v1"])
+@app.get("/v1/estrai-persona", tags=["v1 persona"])
 async def estrai_persona(
         dataRiferimento: date,
         client: Optional[str] = None,
@@ -180,6 +182,7 @@ async def estrai_persona(
         authtoken: str = Header(None)
 ) -> dict:
     """
+    Binding del servizio SOAP U-GOV [estraiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-estraiPersona)
 
     """
     auth = check_token_get_auth(authtoken)
@@ -206,19 +209,62 @@ async def estrai_persona(
 
 
 @app.post(
-    "/v1/persona/inserisci", tags=["v1"]
+    "/v1/persona", tags=["v1 persona"]
 )
 async def inserisci_persona(
         persona: Persona,
         authtoken: str = Header(None)
 ) -> dict:
     """
-    insert persona
+    Binding del servizio SOAP U-GOV [inserisciPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-inserisciPersona)
     """
     auth = check_token_get_auth(authtoken)
     pf = PersonaFisicaService(auth)
     data = {k: v for k, v in persona.dict().items() if v != ''}
     res = pf.inserisci_persona(data)
+
+    return res
+
+
+@app.put(
+    "/v1/persona/{tipo_campo}/{valore}", tags=["v1 persona"]
+)
+async def modifica_persona(
+        tipo_campo: TipoCampoRicerca,
+        valore: str,
+        persona: Persona,
+        authtoken: str = Header(None)
+) -> dict:
+    """
+    Binding del servizio SOAP U-GOV [modificaPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-modificaPersona)
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    data = {k: v for k, v in persona.dict().items() if v != ''}
+
+    if tipo_campo.value == TipoCampoRicerca.codice_fiscale:
+        search = {
+            "codiceFiscale": valore.upper()
+        }
+    elif tipo_campo.value == TipoCampoRicerca.matricola:
+        search = {
+            "matricola": valore
+        }
+    elif tipo_campo.value == TipoCampoRicerca.id_interno:
+        try:
+            x = int(valore)
+        except Exception as e:
+            raise HTTPException(status_code=401, detail="IdIntenrno deve essere un numero")
+
+        search = {
+            "idInterno": int(valore)
+        }
+    elif tipo_campo.value == TipoCampoRicerca.username:
+        search = {
+            "username": valore
+        }
+
+    res = pf.modifica_persona(search, data)
 
     return res
 

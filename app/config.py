@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     jwt_alg: str = "HS256"
     jwt_expire_minute: Optional[int] = None
     _jwt_settings: dict = PrivateAttr()
-    nazioni_e_comuni_ita_url: str = ""
     default_dn: str = ""
 
     def __init__(self, *args, **kwargs):

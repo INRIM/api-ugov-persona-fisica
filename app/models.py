@@ -20,6 +20,7 @@ class UgovAuth(BaseModel):
         tokenb64 = str(bytemsg, "utf-8")
         self._token = f"Basic {tokenb64}"
 
+
 ItemT = TypeVar('ItemT')
 
 
@@ -32,19 +33,26 @@ class DataModel(GenericModel, Generic[ItemT]):
     data: ItemT
 
 
+class TipoCampoRicerca(str, Enum):
+    codice_fiscale = "Codice Fiscale"
+    matricola = "Matricola"
+    username = "Nome Utente (uid)"
+    id_interno = "idInterno"
+
+
 class Persona(BaseModel):
-    nome: str
-    cognome: str
-    codNazioneNascita: str
-    genere: str
-    dataNascita: str
-    codComuneNascita: str
-    codiceFiscale: Optional[str] = None
-    matricola: Optional[str] = None
-    username: Optional[str] = None
-    EMail: Optional[str] = None
-    distNameLDap: Optional[str] = None
-    telUfficio: Optional[str] = None
+    nome: str = ""
+    cognome: str = ""
+    codNazioneNascita: str = ""
+    genere: str = ""
+    dataNascita: str = ""
+    codComuneNascita: str = ""
+    codiceFiscale: Optional[str] = ""
+    matricola: Optional[str] = ""
+    username: Optional[str] = ""
+    EMail: Optional[str] = ""
+    distNameLDap: Optional[str] = ""
+    telUfficio: Optional[str] = ""
 
 
 class ListPersona(BaseModel):

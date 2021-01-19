@@ -24,6 +24,8 @@ class UtilsForService:
         if response.status_code == 200:
             base = xmltodict.parse(response.content)
             ret = self._finditem(base, objectName)
+            if not ret:
+                ret = "done"
             if not type(ret) is dict:
                 ret = {objectName: ret}
         else:
@@ -89,4 +91,11 @@ class PersonaFisicaService(object):
         with client.settings(raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.estraiPersona(dtoRicerca=data)
             djson = self.utils.parseResponse(response, "personaFisica", "faultstring")
+            return djson
+
+    def modifica_persona(self, search_data: dict, data: dict) -> dict:
+        client = Client(self.wsdlurl)
+        with client.settings(strict=False, raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
+            response = client.service.modificaPersona(dtoRicerca=search_data, personaFisica=data)
+            djson = self.utils.parseResponse(response, "Success", "faultstring")
             return djson
