@@ -44,8 +44,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     openapi_url="/persona-fisica/openapi.json",
     docs_url="/persona-fisica/docs",
-    # root_path="/persona-fisica",
-    root_path_in_servers=False,
+    redoc_url="/persona-fisica/redoc",
 )
 
 
@@ -79,7 +78,7 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-@app.get("/", tags=["base"])
+@app.get("/persona-fisica/", tags=["base"])
 async def service_status():
     """
     Ritorna lo stato del servizio
@@ -87,7 +86,7 @@ async def service_status():
     return {"status": "live"}
 
 
-@app.post("/genera-token", tags=["base"])
+@app.post("/persona-fisica/genera-token", tags=["base"])
 async def genera_token(tokendata: Token):
     """
     Genera un token JWT
@@ -100,7 +99,7 @@ async def genera_token(tokendata: Token):
 
 # Aggiungi il codice qui
 
-@app.get("/v1/persone", tags=["v1 persona"])
+@app.get("/persona-fisica/v1/persone", tags=["v1 persona"])
 async def elenca_persone(
         cognome: Optional[str] = None,
         nome: Optional[str] = None,
@@ -124,7 +123,7 @@ async def elenca_persone(
     return res
 
 
-@app.get("/v1/estrai-persona-base", tags=["v1 persona"])
+@app.get("/persona-fisica/v1/estrai-persona-base", tags=["v1 persona"])
 async def estrai_persona_base(
         dataRiferimento: Optional[date] = None,
         client: Optional[str] = None,
@@ -168,7 +167,7 @@ async def estrai_persona_base(
     return res
 
 
-@app.get("/v1/estrai-persona", tags=["v1 persona"])
+@app.get("/persona-fisica/v1/estrai-persona", tags=["v1 persona"])
 async def estrai_persona(
         dataRiferimento: date,
         client: Optional[str] = None,
@@ -213,7 +212,7 @@ async def estrai_persona(
 
 
 @app.post(
-    "/v1/persona", tags=["v1 persona"]
+    "/persona-fisica/v1/persona", tags=["v1 persona"]
 )
 async def inserisci_persona(
         persona: Persona,
@@ -231,7 +230,7 @@ async def inserisci_persona(
 
 
 @app.put(
-    "/v1/persona/{tipo_campo}/{valore}", tags=["v1 persona"]
+    "/persona-fisica/v1/persona/{tipo_campo}/{valore}", tags=["v1 persona"]
 )
 async def modifica_persona(
         tipo_campo: TipoCampoRicerca,
