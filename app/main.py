@@ -41,7 +41,11 @@ app = FastAPI(
     title=get_settings().app_name,
     description=get_settings().app_desc,
     version=get_settings().app_version,
-    openapi_tags=tags_metadata
+    openapi_tags=tags_metadata,
+    openapi_url="/persona-fisica/openapi.json",
+    docs_url="/persona-fisica/docs",
+    # root_path="/persona-fisica",
+    root_path_in_servers=False,
 )
 
 

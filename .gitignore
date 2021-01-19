@@ -2,6 +2,7 @@
 script/automation/etc/*
 script/automation/etc/.
 !script/automation/etc/template_for_service
+__pycache__
 *.csv
 *.pyc
 venv
