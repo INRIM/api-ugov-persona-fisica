@@ -5,6 +5,9 @@ import base64
 from datetime import date, datetime, time, timedelta
 
 from pydantic.generics import GenericModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class UgovAuth(BaseModel):
@@ -21,7 +24,23 @@ class UgovAuth(BaseModel):
         self._token = f"Basic {tokenb64}"
 
 
+class Token(BaseModel):
+    username: str
+    password: str
+    secret: str
+    alg: str
+
+
 ItemT = TypeVar('ItemT')
+
+
+class BaseSuccessResponse(BaseModel):
+    Success: str = "done"
+
+
+class BaseErrorResponse(BaseModel):
+    status: str = "error"
+    message: str
 
 
 class ListModel(GenericModel, Generic[ItemT]):
@@ -40,6 +59,65 @@ class TipoCampoRicerca(str, Enum):
     id_interno = "idInterno"
 
 
+class Utente(BaseModel):
+    dataFineUtente: Optional[datetime] = None
+    dataInizioUtente: Optional[datetime] = None
+    descrUtente: Optional[str] = ""
+    distNameLDap: Optional[str] = ""
+    EMail: Optional[str] = ""
+    indirizzoUtente: Optional[str] = ""
+    telefonoUtente1: Optional[str] = ""
+    telefonoUtente2: Optional[str] = ""
+    username: Optional[str] = ""
+    utenteBloccato: Optional[bool] = None
+    utenteLDAP: Optional[bool] = None
+    utentePwdScaduta: Optional[bool] = None
+
+
+# Gruppi
+
+class GruppoPersona(BaseModel):
+    nomeGruppo: str = ""
+    descrGruppo: Optional[str] = ""
+    sistema: Optional[bool] = False
+
+
+class ListaGruppiPersona(BaseModel):
+    elencoGruppi: List[GruppoPersona]
+
+
+class UtenteGruppi(BaseModel):
+    listaGruppi: Optional[List[GruppoPersona]] = None
+    utente: Utente
+
+
+class UtenteGruppiReponse(BaseModel):
+    gruppiUtente: UtenteGruppi
+
+
+# Profili
+
+class ProfiliPersona(BaseModel):
+    codiceProfilo: str = ""
+    nomeProfilo: Optional[str] = ""
+    descrProfilo: Optional[str] = ""
+    tipoProfilo: Optional[str] = ""
+
+
+class ListaProfiliPersona(BaseModel):
+    elencoProfili: List[ProfiliPersona]
+
+
+class UtenteProfili(BaseModel):
+    listaProfili: Optional[List[ProfiliPersona]] = None
+    utente: Utente
+
+
+class UtenteProfiliResponse(BaseModel):
+    profiliUtente: UtenteProfili
+
+
+# Persona
 class Persona(BaseModel):
     nome: str = ""
     cognome: str = ""
@@ -55,77 +133,82 @@ class Persona(BaseModel):
     telUfficio: Optional[str] = ""
 
 
+class InserisciPersonaResponse(BaseModel):
+    idInterno: Optional[int] = None
+
+
 class ListPersona(BaseModel):
     Persone: List[Persona]
 
 
-class Token(BaseModel):
-    username: str
-    password: str
-    secret: str
-    alg: str
+class PersonaSearch(BaseModel):
+    client: Optional[str] = ""
+    codAnagrafico: Optional[str] = ""
+    codEsse3: Optional[str] = ""
+    codEsterno: Optional[str] = ""
+    codiceFiscale: Optional[str] = ""
+    cognome: Optional[str] = ""
+    dataRiferimento: Optional[date] = None
+    EMail: Optional[str] = ""
+    erroreUtenzaDoppia: Optional[str] = ""
+    idInterno: Optional[int] = None
+    matricola: Optional[str] = ""
+    nome: Optional[str] = ""
+    userAlias: Optional[str] = ""
+    username: Optional[str] = ""
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.codiceFiscale = self.codiceFiscale.upper()
 
 
-class personaFisicaSearch(BaseModel):
-    client: Optional[str] = None
-    codAnagrafico: Optional[str] = None
-    codEsse3: Optional[str] = None
-    codEsterno: Optional[str] = None
-    codiceFiscale: Optional[str] = None
-    cognome: Optional[str] = None
-    dataRiferimento: Optional[str] = None
-    EMail: Optional[str] = None
-    erroreUtenzaDoppia: Optional[str] = None
-    idInterno: Optional[str] = None
-    matricola: Optional[str] = None
-    nome: Optional[str] = None
-    userAlias: Optional[str] = None
-    username: Optional[str] = None
+class ListPersonaSearch(BaseModel):
+    PersonaFisica: List[PersonaSearch]
 
 
-class personaFisicaResponse(BaseModel):
+class PersonaFisica(BaseModel):
     addettoAntiFumo: Optional[bool] = None
     addettoPrevIncendi: Optional[bool] = None
     addettoPrimoSoccorso: Optional[bool] = None
     appartieneOrdineReligioso: Optional[bool] = None
-    badge: Optional[str] = None
-    caoStranieroDomFiscale: Optional[str] = None
-    capDomFiscale: Optional[str] = None
-    capDomicilio: Optional[str] = None
-    capResidenza: Optional[str] = None
-    capStranieraDomicilio: Optional[str] = None
-    capStranieraResidenza: Optional[str] = None
-    casellaPostaleDomicilio: Optional[str] = None
+    badge: Optional[str] = ""
+    caoStranieroDomFiscale: Optional[str] = ""
+    capDomFiscale: Optional[str] = ""
+    capDomicilio: Optional[str] = ""
+    capResidenza: Optional[str] = ""
+    capStranieraDomicilio: Optional[str] = ""
+    capStranieraResidenza: Optional[str] = ""
+    casellaPostaleDomicilio: Optional[str] = ""
     categoriaProtettaAssunzione: Optional[bool] = None
-    cdCia: Optional[str] = None
-    cdEsse3: Optional[str] = None
-    cellPersonale: Optional[str] = None
-    cellUfficio: Optional[str] = None
-    cittaStranieraNascita: Optional[str] = None
-    civicoDomFiscale: Optional[str] = None
-    civicoDomicilio: Optional[str] = None
-    civicoResidenza: Optional[str] = None
-    codASLDomicilio: Optional[str] = None
-    codASLResidenza: Optional[str] = None
-    codAnagrafico: Optional[str] = None
-    codCategoriaProtetta: Optional[str] = None
-    codComuneDomFiscale: Optional[str] = None
-    codComuneDomicilio: Optional[str] = None
-    codComuneNascita: Optional[str] = None
-    codComuneResidenza: Optional[str] = None
-    codEsterno: Optional[str] = None
-    codNazioneCittadinanza: Optional[str] = None
-    codOnorifico: Optional[str] = None
-    codSdi: Optional[str] = None
-    codTipoDocIdentita: Optional[str] = None
-    codiceEsternoRU: Optional[str] = None
-    codiceFiscale: Optional[str] = None
-    codiceFiscaleEstero: Optional[str] = None
-    cognome: Optional[str] = None
-    cognomeAcquisito: Optional[str] = None
+    cdCia: Optional[str] = ""
+    cdEsse3: Optional[str] = ""
+    cellPersonale: Optional[str] = ""
+    cellUfficio: Optional[str] = ""
+    cittaStranieraNascita: Optional[str] = ""
+    civicoDomFiscale: Optional[str] = ""
+    civicoDomicilio: Optional[str] = ""
+    civicoResidenza: Optional[str] = ""
+    codASLDomicilio: Optional[str] = ""
+    codASLResidenza: Optional[str] = ""
+    codAnagrafico: Optional[str] = ""
+    codCategoriaProtetta: Optional[str] = ""
+    codComuneDomFiscale: Optional[str] = ""
+    codComuneDomicilio: Optional[str] = ""
+    codComuneNascita: Optional[str] = ""
+    codComuneResidenza: Optional[str] = ""
+    codEsterno: Optional[str] = ""
+    codNazioneCittadinanza: Optional[str] = ""
+    codOnorifico: Optional[str] = ""
+    codSdi: Optional[str] = ""
+    codTipoDocIdentita: Optional[str] = ""
+    codiceEsternoRU: Optional[str] = ""
+    codiceFiscale: Optional[str] = ""
+    codiceFiscaleEstero: Optional[str] = ""
+    cognome: Optional[str] = ""
+    cognomeAcquisito: Optional[str] = ""
     cpFlag: Optional[bool] = None
-    cpNumeroCasella: Optional[str] = None
-    cpUfficio: Optional[str] = None
+    cpNumeroCasella: Optional[str] = ""
+    cpUfficio: Optional[str] = ""
     dataAssunzionePubblica: Optional[datetime] = None
     dataCategoriaProtetta: Optional[datetime] = None
     dataDocIdentitaRilascio: Optional[datetime] = None
@@ -138,65 +221,69 @@ class personaFisicaResponse(BaseModel):
     dataInizioResidenza: Optional[datetime] = None
     dataInizioUtente: Optional[datetime] = None
     dataNascita: Optional[datetime] = None
-    descrCittaStranieraDomFiscale: Optional[str] = None
-    descrCittaStranieraDomicilio: Optional[str] = None
-    descrCittaStranieraResidenza: Optional[str] = None
-    descrEnteRilascioDocIdentita: Optional[str] = None
-    descrUtente: Optional[str] = None
-    distNameLDap: Optional[str] = None
-    domicilioPressoTerzi: Optional[str] = None
-    EMail: Optional[str] = None
-    edificioDomFiscale: Optional[str] = None
-    edificioDomicilio: Optional[str] = None
-    edificioResidenza: Optional[str] = None
+    descrCittaStranieraDomFiscale: Optional[str] = ""
+    descrCittaStranieraDomicilio: Optional[str] = ""
+    descrCittaStranieraResidenza: Optional[str] = ""
+    descrEnteRilascioDocIdentita: Optional[str] = ""
+    descrUtente: Optional[str] = ""
+    distNameLDap: Optional[str] = ""
+    domicilioPressoTerzi: Optional[str] = ""
+    EMail: Optional[str] = ""
+    edificioDomFiscale: Optional[str] = ""
+    edificioDomicilio: Optional[str] = ""
+    edificioResidenza: Optional[str] = ""
     esoneroObbligoResidenza: Optional[bool] = None
-    fax: Optional[str] = None
+    fax: Optional[str] = ""
     fornitoreCritico: Optional[bool] = None
-    frazioneDomFiscale: Optional[str] = None
-    frazioneDomicilio: Optional[str] = None
-    frazioneResidenza: Optional[str] = None
-    genere: Optional[str] = None
+    frazioneDomFiscale: Optional[str] = ""
+    frazioneDomicilio: Optional[str] = ""
+    frazioneResidenza: Optional[str] = ""
+    genere: Optional[str] = ""
     idInterno: Optional[int] = None
-    indirizzoDomFiscale: Optional[str] = None
-    indirizzoDomicilio: Optional[str] = None
-    indirizzoResidenza: Optional[str] = None
-    indirizzoUtente: Optional[str] = None
-    matricola: Optional[str] = None
-    nome: Optional[str] = None
-    note: Optional[str] = None
-    noteRisorsaUmana: Optional[str] = None
-    numeroDocIdentita: Optional[str] = None
-    PEC: Optional[str] = None
-    partitaIva: Optional[str] = None
-    partitaIvaEstero: Optional[str] = None
+    indirizzoDomFiscale: Optional[str] = ""
+    indirizzoDomicilio: Optional[str] = ""
+    indirizzoResidenza: Optional[str] = ""
+    indirizzoUtente: Optional[str] = ""
+    matricola: Optional[str] = ""
+    nome: Optional[str] = ""
+    note: Optional[str] = ""
+    noteRisorsaUmana: Optional[str] = ""
+    numeroDocIdentita: Optional[str] = ""
+    PEC: Optional[str] = ""
+    partitaIva: Optional[str] = ""
+    partitaIvaEstero: Optional[str] = ""
     percCategoriaProtetta: Optional[int] = None
-    postaElettronicaPrivata: Optional[str] = None
-    postaElettronicaUfficio: Optional[str] = None
-    psCodQuestura: Optional[str] = None
+    postaElettronicaPrivata: Optional[str] = ""
+    postaElettronicaUfficio: Optional[str] = ""
+    psCodQuestura: Optional[str] = ""
     psDataFine: Optional[datetime] = None
     psDataInizio: Optional[datetime] = None
     psDataPres: Optional[datetime] = None
-    psMotivo: Optional[str] = None
-    psNote: Optional[str] = None
-    psNumero: Optional[str] = None
-    psStato: Optional[str] = None
-    quartiereDomFiscale: Optional[str] = None
-    quartiereDomicilio: Optional[str] = None
-    quartiereResidenza: Optional[str] = None
+    psMotivo: Optional[str] = ""
+    psNote: Optional[str] = ""
+    psNumero: Optional[str] = ""
+    psStato: Optional[str] = ""
+    quartiereDomFiscale: Optional[str] = ""
+    quartiereDomicilio: Optional[str] = ""
+    quartiereResidenza: Optional[str] = ""
     le: Optional[bool] = None
-    rifUfficio: Optional[str] = None
-    secondoNome: Optional[str] = None
-    skype: Optional[str] = None
-    statoCivile: Optional[str] = None
-    telCasa: Optional[str] = None
-    telDomicilio: Optional[str] = None
-    telUfficio: Optional[str] = None
-    telefonoUtente1: Optional[str] = None
-    telefonoUtente2: Optional[str] = None
-    urlSitoWeb: Optional[str] = None
-    urlcv: Optional[str] = None
-    userAlias: Optional[str] = None
-    username: Optional[str] = None
+    rifUfficio: Optional[str] = ""
+    secondoNome: Optional[str] = ""
+    skype: Optional[str] = ""
+    statoCivile: Optional[str] = ""
+    telCasa: Optional[str] = ""
+    telDomicilio: Optional[str] = ""
+    telUfficio: Optional[str] = ""
+    telefonoUtente1: Optional[str] = ""
+    telefonoUtente2: Optional[str] = ""
+    urlSitoWeb: Optional[str] = ""
+    urlcv: Optional[str] = ""
+    userAlias: Optional[str] = ""
+    username: Optional[str] = ""
     utenteBloccato: Optional[int] = None
     utenteLDAP: Optional[int] = None
     utentePwdScaduta: Optional[int] = None
+
+
+class PersonaFisicaResp(BaseModel):
+    personaFisica: PersonaFisica

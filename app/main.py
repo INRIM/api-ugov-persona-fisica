@@ -6,7 +6,7 @@ import uuid
 from functools import lru_cache
 import requests
 
-from fastapi import FastAPI, Request, Header, HTTPException
+from fastapi import FastAPI, Request, Header, HTTPException, Depends
 
 from services import *
 from models import *
@@ -31,6 +31,15 @@ tags_metadata = [
     },
 ]
 
+responses = {
+    401: {
+        "description": "Token non valido",
+        "content": {"application/json": {"example": {"detail": "Auth invalid"}}}},
+    422: {
+        "description": "Dati richiesta non corretti",
+        "content": {"application/json": {"example": {"detail": "err messsage"}}}}
+}
+
 
 @lru_cache()
 def get_settings():
@@ -40,7 +49,7 @@ def get_settings():
 app = FastAPI(
     title=get_settings().app_name,
     description=get_settings().app_desc,
-    version=get_settings().app_version,
+    version="1.0.1",
     openapi_tags=tags_metadata,
     openapi_url="/persona-fisica/openapi.json",
     docs_url="/persona-fisica/docs",
@@ -63,6 +72,13 @@ def check_token_get_auth(token: str) -> UgovAuth:
         raise HTTPException(status_code=401, detail="Auth invalid")
 
 
+def check_response_data(res_data: dict) -> dict:
+    if res_data.get("status") and res_data.get("status") == "error":
+        raise HTTPException(status_code=422, detail=res_data['message'])
+    else:
+        return res_data
+
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     idem = str(uuid.uuid4())
@@ -70,7 +86,6 @@ async def log_requests(request: Request, call_next):
     start_time = time_.time()
 
     response = await call_next(request)
-
     process_time = (time_.time() - start_time) * 1000
     formatted_process_time = '{0:.2f}'.format(process_time)
     logger.info(f"rid={idem} completed_in={formatted_process_time}ms status_code={response.status_code}")
@@ -86,7 +101,10 @@ async def service_status():
     return {"status": "live"}
 
 
-@app.post("/persona-fisica/genera-token", tags=["base"])
+@app.post(
+    "/persona-fisica/genera-token",
+    responses=responses,
+    tags=["base"])
 async def genera_token(tokendata: Token):
     """
     Genera un token JWT
@@ -99,13 +117,20 @@ async def genera_token(tokendata: Token):
 
 # Aggiungi il codice qui
 
-@app.get("/persona-fisica/v1/persone", tags=["v1 persona"])
+@app.get(
+    "/persona-fisica/v1/persone",
+    response_model=ListPersonaSearch,
+    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
+    response_model_exclude_defaults=True,
+    responses=responses,
+    tags=["v1 persona"])
 async def elenca_persone(
         cognome: Optional[str] = None,
         nome: Optional[str] = None,
         matricola: Optional[str] = None,
         authtoken: str = Header(None)
-) -> dict:
+):
     """
     Binding del servizio SOAP U-GOV [elencaPersone](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-elencaPersone)
 
@@ -120,122 +145,83 @@ async def elenca_persone(
         }
     )
 
-    return res
+    return check_response_data(res)
 
 
-@app.get("/persona-fisica/v1/estrai-persona-base", tags=["v1 persona"])
+@app.get(
+    "/persona-fisica/v1/estrai-persona-base",
+    response_model=PersonaFisicaResp,
+    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
+    response_model_exclude_defaults=True,
+    responses=responses,
+    tags=["v1 persona"])
 async def estrai_persona_base(
-        dataRiferimento: Optional[date] = None,
-        client: Optional[str] = None,
-        codAnagrafico: Optional[str] = None,
-        codEsse3: Optional[str] = None,
-        codEsterno: Optional[str] = None,
-        codiceFiscale: Optional[str] = None,
-        EMail: Optional[str] = None,
-        erroreUtenzaDoppia: Optional[str] = None,
-        idInterno: Optional[str] = None,
-        matricola: Optional[str] = None,
-        nome: Optional[str] = None,
-        userAlias: Optional[str] = None,
-        username: Optional[str] = None,
+        persona: PersonaSearch = Depends(),
         authtoken: str = Header(None)
-) -> dict:
+):
     """
     Binding del servizio SOAP U-GOV [estraiPersonaBase](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-estraiPersonaBase)
 
     """
     auth = check_token_get_auth(authtoken)
+    res = PersonaFisicaService(auth).estrai_persona_base(persona)
 
-    res = PersonaFisicaService(auth).estrai_persona_base(
-        {
-            "dataRiferimento": dataRiferimento,
-            "client": client,
-            "codAnagrafico": codAnagrafico,
-            "codEsse3": codEsse3,
-            "codEsterno": codEsterno,
-            "codiceFiscale": codiceFiscale.upper() if codiceFiscale else None,
-            "EMail": EMail,
-            "erroreUtenzaDoppia": erroreUtenzaDoppia,
-            "idInterno": idInterno,
-            "matricola": matricola,
-            "nome": nome,
-            "userAlias": userAlias,
-            "username": username
-        }
-    )
-
-    return res
+    return check_response_data(res)
 
 
-@app.get("/persona-fisica/v1/estrai-persona", tags=["v1 persona"])
+@app.get(
+    "/persona-fisica/v1/estrai-persona",
+    response_model=PersonaFisicaResp,
+    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
+    response_model_exclude_defaults=True,
+    responses=responses,
+    tags=["v1 persona"])
 async def estrai_persona(
-        dataRiferimento: date,
-        client: Optional[str] = None,
-        codAnagrafico: Optional[str] = None,
-        codEsse3: Optional[str] = None,
-        codEsterno: Optional[str] = None,
-        codiceFiscale: Optional[str] = None,
-        EMail: Optional[str] = None,
-        erroreUtenzaDoppia: Optional[str] = None,
-        idInterno: Optional[str] = None,
-        matricola: Optional[str] = None,
-        nome: Optional[str] = None,
-        userAlias: Optional[str] = None,
-        username: Optional[str] = None,
+        ricereca_persona: PersonaSearch = Depends(),
         authtoken: str = Header(None)
-) -> dict:
+):
     """
     Binding del servizio SOAP U-GOV [estraiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-estraiPersona)
 
     """
     auth = check_token_get_auth(authtoken)
 
-    res = PersonaFisicaService(auth).estrai_persona(
-        {
-            "dataRiferimento": dataRiferimento,
-            "client": client,
-            "codAnagrafico": codAnagrafico,
-            "codEsse3": codEsse3,
-            "codEsterno": codEsterno,
-            "codiceFiscale": codiceFiscale.upper() if codiceFiscale else None,
-            "EMail": EMail,
-            "erroreUtenzaDoppia": erroreUtenzaDoppia,
-            "idInterno": idInterno,
-            "matricola": matricola,
-            "nome": nome,
-            "userAlias": userAlias,
-            "username": username
-        }
-    )
+    res = PersonaFisicaService(auth).estrai_persona(ricereca_persona)
 
-    return res
+    return check_response_data(res)
 
 
 @app.post(
-    "/persona-fisica/v1/persona", tags=["v1 persona"]
+    "/persona-fisica/v1/persona",
+    response_model=InserisciPersonaResponse,
+    responses=responses,
+    tags=["v1 persona"]
 )
 async def inserisci_persona(
         persona: Persona,
         authtoken: str = Header(None)
-) -> dict:
+):
     """
     Binding del servizio SOAP U-GOV [inserisciPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-inserisciPersona)
     """
     auth = check_token_get_auth(authtoken)
     pf = PersonaFisicaService(auth)
-    data = {k: v for k, v in persona.dict().items() if v != ''}
-    res = pf.inserisci_persona(data)
+    res = pf.inserisci_persona(persona)
 
-    return res
+    return check_response_data(res)
 
 
 @app.put(
-    "/persona-fisica/v1/persona/{tipo_campo}/{valore}", tags=["v1 persona"]
+    "/persona-fisica/v1/persona",
+    response_model=BaseSuccessResponse,
+    responses=responses,
+    tags=["v1 persona"]
 )
 async def modifica_persona(
-        tipo_campo: TipoCampoRicerca,
-        valore: str,
         persona: Persona,
+        ricereca_persona: PersonaSearch = Depends(),
         authtoken: str = Header(None)
 ) -> dict:
     """
@@ -243,32 +229,144 @@ async def modifica_persona(
     """
     auth = check_token_get_auth(authtoken)
     pf = PersonaFisicaService(auth)
-    data = {k: v for k, v in persona.dict().items() if v != ''}
+    res = pf.modifica_persona(ricereca_persona, persona)
 
-    if tipo_campo.value == TipoCampoRicerca.codice_fiscale:
-        search = {
-            "codiceFiscale": valore.upper()
-        }
-    elif tipo_campo.value == TipoCampoRicerca.matricola:
-        search = {
-            "matricola": valore
-        }
-    elif tipo_campo.value == TipoCampoRicerca.id_interno:
-        try:
-            x = int(valore)
-        except Exception as e:
-            raise HTTPException(status_code=401, detail="IdIntenrno deve essere un numero")
+    return check_response_data(res)
 
-        search = {
-            "idInterno": int(valore)
-        }
-    elif tipo_campo.value == TipoCampoRicerca.username:
-        search = {
-            "username": valore
-        }
-
-    res = pf.modifica_persona(search, data)
-
-    return res
 
 # get persona/{ID}
+
+# elencaGruppiPersona;
+@app.get(
+    "/persona-fisica/v1/gruppi-parsona",
+    response_model=UtenteGruppiReponse,
+    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
+    response_model_exclude_defaults=True,
+    responses=responses,
+    tags=["v1 gruppi persona"])
+async def elenca_gruppi_persona(
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-elencaGruppiPersona)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.elenca_gruppi_persona(ricerca_persona)
+
+    return check_response_data(res)
+
+
+# inserisciPersonaInGruppi;
+@app.post(
+    "/persona-fisica/v1/gruppi-parsona",
+    response_model=BaseSuccessResponse,
+    responses=responses,
+    tags=["v1 gruppi persona"])
+async def inserisci_persona_in_gruppi(
+        gruppi_persona: ListaGruppiPersona,
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-inserisciPersonaInGruppi)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.inserisci_persona_in_gruppi(ricerca_persona, gruppi_persona)
+
+    return check_response_data(res)
+
+
+# eliminaPersonaDaGruppi.
+@app.delete(
+    "/persona-fisica/v1/gruppi-parsona",
+    response_model=BaseSuccessResponse,
+    responses=responses,
+    tags=["v1 gruppi persona"])
+async def elimina_persona_da_gruppi(
+        gruppi_persona: ListaGruppiPersona,
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-eliminaPersonaDaGruppi)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.elimina_persona_da_gruppi(ricerca_persona, gruppi_persona)
+
+    return check_response_data(res)
+
+
+# elencaProfiliPersona;
+@app.get(
+    "/persona-fisica/v1/profili-parsona",
+    response_model=UtenteProfiliResponse,
+    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
+    response_model_exclude_defaults=True,
+    responses=responses,
+    tags=["v1 profili persona"])
+async def elenca_profili_persona(
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-elencaProfiliPersona)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.elenca_profili_persona(ricerca_persona)
+
+    return check_response_data(res)
+
+
+# inserisciProfiliInGruppi;
+@app.post(
+    "/persona-fisica/v1/profili-parsona",
+    response_model=BaseSuccessResponse,
+    responses=responses,
+    tags=["v1 profili persona"])
+async def inserisci_persona_in_profili(
+        profili_persona: ListaProfiliPersona,
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-inserisciPersonaInProfili)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.inserisci_persona_in_profili(ricerca_persona, profili_persona)
+
+    return check_response_data(res)
+
+
+# eliminaProfiliDaGruppi.
+@app.delete(
+    "/persona-fisica/v1/profili-parsona",
+    response_model=BaseSuccessResponse,
+    responses=responses,
+    tags=["v1 profili persona"])
+async def elimina_persona_da_profili(
+        profili_persona: ListaProfiliPersona,
+        ricerca_persona: PersonaSearch = Depends(),
+        authtoken: str = Header(None)
+):
+    """
+    Binding del servizio SOAP U-GOV [elencaGruppiPersona](https://wiki.u-gov.it/confluence/pages/releaseview.action?pageId=79822895#WSACPersonaFisica(SOAP)-eliminaPersonaDaProfili)
+
+    """
+    auth = check_token_get_auth(authtoken)
+    pf = PersonaFisicaService(auth)
+    res = pf.elimina_persona_da_profili(ricerca_persona, profili_persona)
+
+    return check_response_data(res)

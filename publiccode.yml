@@ -6,7 +6,7 @@ publiccodeYmlVersion: '0.2'
 name: API Integrazione U-GOV JP - WSACPersonaFisica (SOAP)
 url: 'https://github.com/INRIM/api-ugov-persona-fisica.git'
 releaseDate: '2021-01-18'
-softwareVersion: 1.0.0
+softwareVersion: 1.0.1
 developmentStatus: beta
 platforms:
   - web
