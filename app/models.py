@@ -163,7 +163,7 @@ class PersonaSearch(BaseModel):
 
 
 class ListPersonaSearch(BaseModel):
-    PersonaFisica: List[PersonaSearch]
+    PersonaFisica: Optional[List[PersonaSearch]] = None
 
 
 class PersonaFisica(BaseModel):

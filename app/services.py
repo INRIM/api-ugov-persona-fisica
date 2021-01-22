@@ -126,7 +126,13 @@ class PersonaFisicaService(object):
         # data = data.dict(exclude_none=True, exclude_unset=True, exclude_defaults=True)
         with client.settings(raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.elencaPersone(data)
-            djson = self.utils.parseResponse(response, "PersonaFisica", "faultstring")
+            djson = self.utils.parseResponse(response, "PersonaFisica", "faultstring", [])
+            if djson.get('PersonaFisica') and not type(djson.get('PersonaFisica')) is list:
+                dat = djson['PersonaFisica']
+                djson['PersonaFisica'] = []
+                if not dat == 'done':
+                    djson['PersonaFisica'].append(dat)
+            logger.info(djson)
             return djson
 
     def inserisci_persona(self, data: Persona) -> dict:
@@ -168,7 +174,7 @@ class PersonaFisicaService(object):
         with client.settings(strict=False, raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.elencaGruppiPersona(data)
             djson = self.utils.parseResponse(
-                response, "gruppiUtente", "faultstring", ['utente', 'listaGruppi'], log_resp=True)
+                response, "gruppiUtente", "faultstring", ['utente', 'listaGruppi'])
             return djson
 
     def inserisci_persona_in_gruppi(self, data: PersonaSearch, gruppi_persona: ListaGruppiPersona) -> dict:
@@ -178,7 +184,7 @@ class PersonaFisicaService(object):
         with client.settings(strict=False, raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.inserisciPersonaInGruppi(data, gruppi_persona['elencoGruppi'])
             djson = self.utils.parseResponse(
-                response, "Success", "faultstring", [], log_resp=True)
+                response, "Success", "faultstring", [])
             return djson
 
     def elimina_persona_da_gruppi(self, data: PersonaSearch, gruppi_persona: ListaGruppiPersona) -> dict:
