@@ -67,7 +67,7 @@ Clonare il progetto
     sh build_and_run.sh
     ```
   
-    il servizio si avvia avvia http://localhost:8022/
+    il servizio si avvia avvia http://localhost:8022/persona-fisica/
   
     lo script abilita autoreload dei file per semplificare la fase di sviluppo
 
@@ -83,7 +83,7 @@ Clonare il progetto
   
   Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
   
-  il servizio si avvia http://{url}:8022/
+  il servizio si avvia http://{url}:8022/persona-fisica/
 
 - #### Ambiente di Produzione
 
@@ -98,19 +98,19 @@ Clonare il progetto
   
   Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
   
-  il servizio si avvia http://{url}:8022/
+  il servizio si avvia http://{url}:8022/persona-fisica/
 
 
 ## Documentazione e Test delle Api
 
 Una volta avviato il progetto la documentazione delle API è disponibile agli url:
 
-- {BASE_URL}:8022/redoc ( Redoc )
-- {BASE_URL}:8022/docs ( Swagger )
+- {BASE_URL}:8022/persona-fisica/redoc ( Redoc )
+- {BASE_URL}:8022/persona-fisica/docs ( Swagger )
 
 Tramite la Documentazione Swagger e' possibile testare le API:
 
-- {BASE_URL}:8022/docs
+- {BASE_URL}:8022/persona-fisica/docs
 
 Per eseguire i test è necessario inserire come parametro header il token JWT generato
 
