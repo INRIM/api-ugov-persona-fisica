@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+
+  ugovws-pf:
+    tty: true
+    build:
+      context: .
+      network: host
+    image: python3.8.ugovws
+    volumes:
+      - ./app:/app
+    environment:
+      - WEB_CONCURRENCY=3
+    ports:
+      - "8022:80"
+    restart: 'always'
+
+
+  test-ugovws-pf:
+    tty: true
+    build:
+      context: .
+      network: host
+    image: python3.8.ugovws
+    volumes:
+      - ./app:/app
+    environment:
+      - WEB_CONCURRENCY=1
+    ports:
+      - "9022:80"
+    restart: 'always'

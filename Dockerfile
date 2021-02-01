@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir passlib[bcrypt]
 RUN pip install --no-cache-dir git+https://github.com/INRIM/python-zeep.git
 
 
-COPY ./app /app
+#COPY ./app /app
