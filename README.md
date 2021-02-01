@@ -16,7 +16,7 @@ Clonare il progetto
       ```
         cp .env.example  .env
         ```
-        ```
+      ```
         cp .env.example  .env-test
         ```
 - #### Url Ambienti U-GOV
