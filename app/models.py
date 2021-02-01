@@ -10,6 +10,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
+
+
+class Token(BaseModel):
+    username: str
+    password: str
+    secret: str
+    alg: str
+
+class BaseSuccessResponse(BaseModel):
+    Success: str = "done"
+
+
+class BaseErrorResponse(BaseModel):
+    status: str = "error"
+    message: str
+
+
+ItemT = TypeVar('ItemT')
+
+
 class UgovAuth(BaseModel):
     username: str
     password: str
@@ -22,25 +43,6 @@ class UgovAuth(BaseModel):
         bytemsg = base64.b64encode(token.encode('utf-8'))
         tokenb64 = str(bytemsg, "utf-8")
         self._token = f"Basic {tokenb64}"
-
-
-class Token(BaseModel):
-    username: str
-    password: str
-    secret: str
-    alg: str
-
-
-ItemT = TypeVar('ItemT')
-
-
-class BaseSuccessResponse(BaseModel):
-    Success: str = "done"
-
-
-class BaseErrorResponse(BaseModel):
-    status: str = "error"
-    message: str
 
 
 class ListModel(GenericModel, Generic[ItemT]):
