@@ -14,13 +14,15 @@ Clonare il progetto
 - #### Configurazione 
     - creare una copia di .env.example:
       ```
-        cp .env.example  app/.env
+        cp .env.example  .env
         ```
-  
+        ```
+        cp .env.example  .env-test
+        ```
 - #### Url Ambienti U-GOV
 
-  Editare la chiave `BASE_URL_WS` file .env inserendo la url di pre-prod o prod di U-GOV
-  come descritto nelle linee guida della documentazione del Technical Portal di U-GOV
+  Editare la chiave `BASE_URL_WS` file .env inserendo la url di pre-prod in .env-test
+  e prod in .env di U-GOV, come descritto nelle linee guida della documentazione del Technical Portal di U-GOV
   
 - #### JWT Token e Autenticazione WS U-GOV
     
@@ -61,44 +63,25 @@ Clonare il progetto
     
     Assicurarsi di avere Docker Installato
     
-    Se necessario modificare il binding porta 8022
+    Se necessario modificare il binding porta 8022 e 9022
   
     ```
     sh build_and_run.sh
     ```
   
-    il servizio si avvia avvia http://localhost:8022/persona-fisica/
+    il servizio si avvia prod  http://localhost:8022/persona-fisica/
+    il servizio si avvia test  http://localhost:9022/persona-fisica/
   
     lo script abilita autoreload dei file per semplificare la fase di sviluppo
 
 
 - #### Ambiente di Test / Pre-Produzione
 
-  Assicurarsi di avere Docker Installato ed eseguire `sh build_and_run_test.sh`
-
-  E' possibile modificare:
-  
-    - binding porta 8022 `-p 8022:80`
-    - il numero di Worker editando  `WEB_CONCURRENCY=1`
-  
-  Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
-  
-  il servizio si avvia http://{url}:8022/persona-fisica/
+  Per convenzione del progetto l'ambiete di test e' risponde sulla porta 9022
 
 - #### Ambiente di Produzione
 
-  Assicurarsi di avere Docker Installato ed eseguire `sh build_and_run_prod.sh`
-
-  E' possibile modificare:
-  
-    - binding porta 8022 `-p 8022:80`
-    - il numero di Worker editando  `WEB_CONCURRENCY=1`
-  
-  Per il calcolo del numero di worker eseguire la seguente operazione `(CPU x 2)+1`
-  
-  Il reverse Proxy e' delegato ad un webserver ad esempio Nginx
-  
-  il servizio si avvia http://{url}:8022/persona-fisica/
+  Per convenzione del progetto l'ambiete di test e' risponde sulla porta 8022
 
 
 ## Documentazione e Test delle Api
@@ -110,7 +93,8 @@ Una volta avviato il progetto la documentazione delle API è disponibile agli ur
 
 Tramite la Documentazione Swagger e' possibile testare le API:
 
-- {BASE_URL}:8022/persona-fisica/docs
+- {BASE_URL}:8022/persona-fisica/docs (da bloccare in ambiente di prod )
+- {BASE_URL}:9022/persona-fisica/docs
 
 Per eseguire i test è necessario inserire come parametro header il token JWT generato
 
