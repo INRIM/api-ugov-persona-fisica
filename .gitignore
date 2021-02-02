@@ -11,3 +11,4 @@ key.json
 jwt_setting.json
 .idea
 .env
+.env-test

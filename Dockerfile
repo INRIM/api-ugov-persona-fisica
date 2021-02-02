@@ -2,6 +2,7 @@ FROM tiangolo/uvicorn-gunicorn:python3.8
 
 LABEL maintainer="Alessio Gerace <a.gerace@inrim.it>"
 
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir fastapi
 RUN pip install --no-cache-dir requests
 RUN pip install --no-cache-dir aiohttp
