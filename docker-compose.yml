@@ -23,7 +23,7 @@ services:
     build:
       context: .
       network: host
-    image: python3.8.ugovws_test
+    image: python3.8.ugovws-api-pf_test
     volumes:
       - ./app:/app
       - .env-test:/app/.env

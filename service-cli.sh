@@ -1,2 +1,2 @@
 #!/bin/bash
-docker exec -ti ugovws_ugovws-pf_1 /bin/sh; exit
+docker exec -ti ugovws-api-pf_ugovws-pf_1 /bin/sh; exit
