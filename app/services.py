@@ -116,10 +116,10 @@ class UtilsForService:
 class PersonaFisicaService(object):
 
     def __init__(self, auth: UgovAuth):
-        logger.inf(f"-----------")
-        logger.inf(f"Init Service at {auth.base_url_ws}")
-        logger.inf(f"...")
-        logger.inf(f"complete url {auth.base_url_ws}/ws-ac/ws/private/PersonaFisica?wsdl")
+        logger.info(f"-----------")
+        logger.info(f"Init Service at {auth.base_url_ws}")
+        logger.info(f"...")
+        logger.info(f"complete url {auth.base_url_ws}/ws-ac/ws/private/PersonaFisica?wsdl")
         self.wsdlurl = f'{auth.base_url_ws}/ws-ac/ws/private/PersonaFisica?wsdl'
         logger.info("PersonaFisicaService Init")
         self.auth = auth
