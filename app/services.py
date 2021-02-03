@@ -121,9 +121,9 @@ class PersonaFisicaService(object):
         logger.info(f"...")
         logger.info(f"complete url {auth.base_url_ws}/ws-ac/ws/private/PersonaFisica?wsdl")
         self.wsdlurl = f'{auth.base_url_ws}/ws-ac/ws/private/PersonaFisica?wsdl'
-        logger.info("PersonaFisicaService Init")
         self.auth = auth
         self.utils = UtilsForService()
+        logger.info("PersonaFisicaService Init")
 
     def lista_persone(self, data: dict) -> dict:
         client = Client(self.wsdlurl)
