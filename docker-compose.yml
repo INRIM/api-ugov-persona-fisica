@@ -14,7 +14,7 @@ services:
       - .env:/app/.env
     environment:
       - WEB_CONCURRENCY=3
-      - PORT_SERVICE=8022
+      - PORT=8022
     ports:
       - "8022:8022"
     restart: 'always'
@@ -32,7 +32,7 @@ services:
       - .env-test:/app/.env
     environment:
       - WEB_CONCURRENCY=1
-      - PORT_SERVICE=9022
+      - PORT=9022
     ports:
       - "9022:9022"
     restart: 'always'

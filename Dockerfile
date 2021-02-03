@@ -16,9 +16,5 @@ RUN pip install --no-cache-dir python-jose[cryptography]
 RUN pip install --no-cache-dir passlib[bcrypt]
 RUN pip install --no-cache-dir git+https://github.com/INRIM/python-zeep.git
 
-EXPOSE 80
-
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT_SERVICE}"]
 
 #COPY ./app /app
