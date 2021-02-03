@@ -7,7 +7,7 @@ services:
     build:
       context: .
       network: host
-    image: python3.8.ugovws
+    image: python3.8.ugovws-api-pf
     volumes:
       - ./app:/app
       - .env:/app/.env

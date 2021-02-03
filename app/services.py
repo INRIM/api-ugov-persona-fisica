@@ -128,6 +128,7 @@ class PersonaFisicaService(object):
     def lista_persone(self, data: dict) -> dict:
         client = Client(self.wsdlurl)
         # data = data.dict(exclude_none=True, exclude_unset=True, exclude_defaults=True)
+        logger.info("Client create start request")
         with client.settings(raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.elencaPersone(data)
             djson = self.utils.parseResponse(response, "PersonaFisica", "faultstring", [])
