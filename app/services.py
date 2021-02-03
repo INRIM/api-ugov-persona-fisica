@@ -126,6 +126,7 @@ class PersonaFisicaService(object):
         logger.info("PersonaFisicaService Init")
 
     def lista_persone(self, data: dict) -> dict:
+        logger.info("prepare Client to start request")
         client = Client(self.wsdlurl)
         # data = data.dict(exclude_none=True, exclude_unset=True, exclude_defaults=True)
         logger.info("Client create start request")

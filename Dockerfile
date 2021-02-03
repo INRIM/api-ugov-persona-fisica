@@ -10,7 +10,8 @@ RUN pip install --no-cache-dir xmltodict
 RUN pip install --no-cache-dir ujson
 RUN pip install --no-cache-dir python-jose[cryptography]
 RUN pip install --no-cache-dir passlib[bcrypt]
-RUN pip install --no-cache-dir git+https://github.com/INRIM/python-zeep.git
+#RUN pip install --no-cache-dir git+https://github.com/INRIM/python-zeep.git
+RUN pip install --no-cache-dir zeep
 
 
 #COPY ./app /app
