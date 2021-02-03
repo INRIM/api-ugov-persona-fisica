@@ -15,7 +15,7 @@ services:
     environment:
       - WEB_CONCURRENCY=3
     ports:
-      - "8022:80"
+      - "8022:8022"
     restart: 'always'
 
 
@@ -32,5 +32,5 @@ services:
     environment:
       - WEB_CONCURRENCY=1
     ports:
-      - "9022:80"
+      - "9022:8022"
     restart: 'always'
