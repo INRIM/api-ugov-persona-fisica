@@ -8,7 +8,7 @@ services:
       context: .
       network: host
     image: python3.8.ugovws-api-pf
-    network_mode: "bridge"
+    network_mode: "host"
     volumes:
       - ./app:/app
       - .env:/app/.env
@@ -26,7 +26,7 @@ services:
       context: .
       network: host
     image: python3.8.ugovws-api-pf_test
-    network_mode: "bridge"
+    network_mode: "host"
     volumes:
       - ./app:/app
       - .env-test:/app/.env
