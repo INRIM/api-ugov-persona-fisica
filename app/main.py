@@ -166,6 +166,7 @@ async def estrai_persona_base(
     """
     auth = check_token_get_auth(authtoken)
     res = PersonaFisicaService(auth).estrai_persona_base(persona)
+    logger.info(f"Response data --> {res}")
 
     return check_response_data(res)
 
