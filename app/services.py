@@ -155,6 +155,8 @@ class PersonaFisicaService(object):
         with client.settings(raw_response=True, extra_http_headers={'Authorization': self.auth._token}):
             response = client.service.estraiPersonaBase(data)
             djson = self.utils.parseResponse(response, "personaFisica", "faultstring")
+            if djson['personaFisica'] == 'done':
+                djson['personaFisica'] = {}
             return djson
 
     def estrai_persona(self, data: PersonaSearch) -> dict:
