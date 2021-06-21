@@ -107,6 +107,10 @@ Per eseguire i test è necessario inserire come parametro header il token JWT ge
 
 Usiamo [SemVer](http://semver.org/) per il versionamento. Versioni disponibili, vedere [tags in questo repository](https://github.com/INRIM/api-ugov-persona-fisica/tags). 
 
+Authors
+------------
+
+- Alessio Gerace
 
 ## Licenza
 
