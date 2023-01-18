@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   ugovws-pf:
@@ -7,7 +5,7 @@ services:
     build:
       context: .
       network: host
-    image: python3.8.ugovws-api-pf
+    image: python3.11.ugovws-api-pf
     network_mode: "host"
     volumes:
       - ./app:/app
@@ -25,8 +23,8 @@ services:
     build:
       context: .
       network: host
-    image: python3.8.ugovws-api-pf_test
-    network_mode: "host"
+    image: python3.11.ugovws-api-pf_test
+#    network_mode: "host"
     volumes:
       - ./app:/app
       - .env-test:/app/.env
