@@ -49,7 +49,7 @@ def get_settings():
 app = FastAPI(
     title=get_settings().app_name,
     description=get_settings().app_desc,
-    version="1.0.1",
+    version="1.1.0",
     openapi_tags=tags_metadata,
     openapi_url="/persona-fisica/openapi.json",
     docs_url="/persona-fisica/docs",
