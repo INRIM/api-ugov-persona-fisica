@@ -57,7 +57,6 @@ def check_token_get_auth(token: str) -> Auth:
 
     utils = UtilsForService()
     jwt_settings = get_settings().jwt_settings
-    print(jwt_settings)
     data = utils.decode_token(token, jwt_settings)
 
     if "username" in data and "password" in data:
