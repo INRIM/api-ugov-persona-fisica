@@ -244,7 +244,7 @@ class PersonaFisicaService(object):
 
         response = self.service.estraiPersona(dtoRicerca=data)
         djson = self.utils.parseResponse(response, "personaFisica",
-                                         "faultstring")
+                                         "faultstring", log_resp=True)
         return djson
 
     def modifica_persona(self, search_data: PersonaSearch,

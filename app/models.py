@@ -118,6 +118,18 @@ class UtenteProfili(BaseModel):
 class UtenteProfiliResponse(BaseModel):
     profiliUtente: UtenteProfili
 
+class Auth(BaseModel):
+    username: str
+    password: str
+    base_url_ws: str
+    _token: str = PrivateAttr()
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        token = f"{self.username}:{self.password}"
+        bytemsg = base64.b64encode(token.encode('utf-8'))
+        tokenb64 = str(bytemsg, "utf-8")
+        self._token = f"Basic {tokenb64}"
 
 # Persona
 class Persona(BaseModel):

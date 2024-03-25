@@ -1,18 +1,17 @@
 import logging
 import os
+import requests
 import string
 import time
-import uuid
-from functools import lru_cache
-import requests
-
-from fastapi import FastAPI, Request, Header, HTTPException, Depends
-
-from services import *
-from models import *
-from datetime import *
 import time as time_
-import config
+import uuid
+from datetime import *
+from fastapi import FastAPI, Request, Header, HTTPException, Depends
+from functools import lru_cache
+
+from models import *
+from services import *
+from settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -40,12 +39,6 @@ responses = {
         "content": {"application/json": {"example": {"detail": "err messsage"}}}}
 }
 
-
-@lru_cache()
-def get_settings():
-    return config.Settings()
-
-
 app = FastAPI(
     title=get_settings().app_name,
     description=get_settings().app_desc,
@@ -57,15 +50,19 @@ app = FastAPI(
 )
 
 
-def check_token_get_auth(token: str) -> UgovAuth:
+def check_token_get_auth(token: str) -> Auth:
     if not token:
         raise HTTPException(status_code=401, detail="Auth invalid")
     logger.info("check_token_get_auth")
+
     utils = UtilsForService()
-    jwt_settings = get_settings()._jwt_settings
+    jwt_settings = get_settings().jwt_settings
+    print(jwt_settings)
     data = utils.decode_token(token, jwt_settings)
+
     if "username" in data and "password" in data:
-        auth = UgovAuth(username=data['username'], password=data['password'], base_url_ws=get_settings().base_url_ws)
+        auth = Auth(username=data['username'], password=data['password'],
+                    base_url_ws=get_settings().base_url_ws)
         return auth
     else:
         logger.error("jwt string invalid")
@@ -88,7 +85,8 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     process_time = (time_.time() - start_time) * 1000
     formatted_process_time = '{0:.2f}'.format(process_time)
-    logger.info(f"rid={idem} completed_in={formatted_process_time}ms status_code={response.status_code}")
+    logger.info(
+        f"rid={idem} completed_in={formatted_process_time}ms status_code={response.status_code}")
 
     return response
 
